@@ -1,55 +1,76 @@
 const Bootcamp = require("../models/Bootcamps");
-const asyncHandler = require("../middleware/async");
 const ErrorResponse = require("../utils/errorResponse");
 
-exports.getBootcamps = asyncHandler(async (req, res, next) => {
-  const bootcamps = await Bootcamp.find().populate("courses");
-  res.status(200).json({ success: true, data: bootcamps });
-});
+exports.getBootcamps = async (req, res, next) => {
+  try {
+    const bootcamps = await Bootcamp.find().populate("courses");
+    res.status(200).json({ success: true, data: bootcamps });
+  } catch (error) {
+    next(error);
+  }
+};
 
-exports.createBootcamp = asyncHandler(async (req, res, next) => {
-  console.log(req);
-  const bootcamp = await Bootcamp.insertMany(req.body);
-  res.status(201).json({ success: true, data: bootcamp });
-});
+exports.createBootcamp = async (req, res, next) => {
+  try {
+    req.body.user = req.user.id;
+    const bootcamp = await Bootcamp.insertMany(req.body);
+    res.status(201).json({ success: true, data: bootcamp });
+  } catch (error) {
+    next(error);
+  }
+};
 
-exports.getBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamps = await Bootcamp.findById(req.params.id).populate("courses");
-
-  if (!bootcamps)
-    return next(
-      new ErrorResponse(`This id is not valid ${req.params.id}`, 404)
+exports.getBootcamp = async (req, res, next) => {
+  try {
+    const bootcamps = await Bootcamp.findById(req.params.id).populate(
+      "courses"
     );
 
-  res.status(200).json({ success: true, data: bootcamps });
-});
+    if (!bootcamps)
+      return next(
+        new ErrorResponse(`This id is not valid ${req.params.id}`, 404)
+      );
 
-exports.updateBootcamps = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  // const bootcamp = await Bootcamp.findById(req.params.id);
-
-  // bootcamp.name = "urvesh";
-  // console.log(bootcamp);
-
-  // await bootcamp.save();
-
-  if (!bootcamp) {
-    return res.status(400).json({ success: false });
+    res.status(200).json({ success: true, data: bootcamps });
+  } catch (error) {
+    next(error);
   }
+};
 
-  res.status(200).json({ success: true, data: bootcamp });
-});
+exports.updateBootcamps = async (req, res, next) => {
+  try {
+    const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-exports.deleteBootcamps = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findById(req.params.id);
-  if (!bootcamp) {
-    return res.status(400).json({ success: false });
+    // const bootcamp = await Bootcamp.findById(req.params.id);
+
+    // bootcamp.name = "urvesh";
+    // console.log(bootcamp);
+
+    // await bootcamp.save();
+
+    if (!bootcamp) {
+      return res.status(400).json({ success: false });
+    }
+
+    res.status(200).json({ success: true, data: bootcamp });
+  } catch (error) {
+    next(error);
   }
+};
 
-  bootcamp.remove();
-  res.status(200).json({ success: true, data: {} });
-});
+exports.deleteBootcamps = async (req, res, next) => {
+  try {
+    const bootcamp = await Bootcamp.findById(req.params.id);
+    if (!bootcamp) {
+      return res.status(400).json({ success: false });
+    }
+
+    bootcamp.remove();
+    res.status(200).json({ success: true, data: {} });
+  } catch (error) {
+    next(error);
+  }
+};
