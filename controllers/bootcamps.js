@@ -12,7 +12,7 @@ exports.getBootcamps = async (req, res, next) => {
 
 exports.createBootcamp = async (req, res, next) => {
   try {
-    req.body.user = req.user.id;
+    console.log(req.user);
     const bootcamp = await Bootcamp.insertMany(req.body);
     res.status(201).json({ success: true, data: bootcamp });
   } catch (error) {

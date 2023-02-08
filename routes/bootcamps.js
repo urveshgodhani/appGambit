@@ -8,19 +8,17 @@ const {
 } = require("../controllers/bootcamps");
 const courseRouter = require("./courses");
 const { protect, authorize } = require("../middleware/auth");
+const checkAuthenticated = require("../middleware/passport_isAuth");
 
 const router = express.Router();
 
 router.use("/:bootcampId/courses", courseRouter);
 
-router
-  .route("/")
-  .get(getBootcamps)
-  .post(protect, authorize("admin", "publisher"), createBootcamp);
+router.route("/").get(getBootcamps).post(checkAuthenticated, createBootcamp);
 router
   .route("/:id")
   .get(getBootcamp)
-  .patch(protect, authorize("admin", "publisher"), updateBootcamps)
-  .delete(protect, authorize("admin", "publisher"), deleteBootcamps);
+  .patch(checkAuthenticated, authorize("admin", "publisher"), updateBootcamps)
+  .delete(checkAuthenticated, authorize("admin", "publisher"), deleteBootcamps);
 
 module.exports = router;
